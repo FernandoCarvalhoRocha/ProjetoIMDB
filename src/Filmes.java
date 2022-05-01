@@ -23,19 +23,12 @@ public class Filmes {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         String json = response.body();
         String[] arrayMovies = parseMovies(json);
-        String[] arrayAttributes = parseAttributes(arrayMovies);
-        System.out.println(json);
-        for (String title : getAttribute(arrayAttributes, "title")) {
-            System.out.println(title);
-        }
-        for (String url : getAttribute(arrayAttributes, "image")) {
-            System.out.println(url);
-        }
-        for (String rating : getAttribute(arrayAttributes, "imDbRating\"")) {
-            System.out.println(rating);
-        }
-        for (String year : getAttribute(arrayAttributes, "year")) {
-            System.out.println(year);
+//        String[] arrayAttributes = parseAttributes(arrayMovies);
+        for (Movie movie : getMovies(arrayMovies)){
+            System.out.println(movie.getTitle());
+            System.out.println(movie.getUrlImage());
+            System.out.println(movie.getRating());
+            System.out.println(movie.getYear());
         }
     }
 
@@ -48,14 +41,57 @@ public class Filmes {
             return attribute.split(",");
         }
 
-    public static List<String> getAttribute(String[] attributes, String find) {
-        List<String> att = new ArrayList<>();
-        for (String attribute : attributes) {
+    public static String getAttribute(String attributes, String find) {
+        String [] att = attributes.split(",");
+        for (String attribute : att) {
             if (attribute.contains(find)) {
                 int i = attribute.indexOf(find);
-                att.add(attribute.substring(i));
+                attributes = (attribute.substring(i));
+            return attributes;
             }
         }
-        return att;
+        return attributes;
+    }
+
+    public static String getRating(String rating, String find) {
+      String[] spt = rating.split(",");
+        for (String rt : spt) {
+            if (rt.contains(find)) {
+                int i = rt.indexOf(find) + 13;
+                int f = rt.indexOf(find) + 16;
+                rating = (rt.substring(i, f));
+                return rating;
+            }
+        }
+return rating;
+    }
+
+    public static String getYear(String year, String find) {
+        String[] spt = year.split(",");
+        for (String yr : spt) {
+            if (yr.contains(find)) {
+                int i = yr.indexOf(find) + 7;
+                int f = yr.indexOf(find) + 11;
+                year = (yr.substring(i, f));
+                return year;
+            }
+        }
+        return year;
+    }
+
+    public static List<Movie> getMovies(String[] parseMovie) {
+
+        List<Movie> mv = new ArrayList<>();
+        for (String mve : parseMovie ){
+            Movie movie = new Movie();
+            movie.setTitle(getAttribute(mve, "title"));
+            movie.setUrlImage(getAttribute(mve,"image" ));
+            Float rt = Float.parseFloat(getRating(mve, "imDbRating\""));
+            movie.setRating(rt);
+            Integer yr = Integer.parseInt(getYear(mve,"year"));
+            movie.setYear(yr);
+            mv.add(movie);
+        }
+        return mv;
     }
 }
